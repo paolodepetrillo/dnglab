@@ -77,6 +77,7 @@ impl<'a> Decoder for DngDecoder<'a> {
 
     let mut image = RawImage::new(cam, image, cpp, self.get_wb()?, photometric, blacklevel, whitelevel, dummy);
     image.orientation = orientation;
+    image.dng_opcode_lists = self.get_dng_opcode_lists(raw);
 
     Ok(image)
   }

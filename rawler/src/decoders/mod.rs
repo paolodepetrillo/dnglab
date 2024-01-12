@@ -130,7 +130,7 @@ pub struct RawDecodeParams {
   pub image_index: usize,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct DngOpcodeLists {
   pub list_1: Option<Vec<u8>>,
   pub list_2: Option<Vec<u8>>,

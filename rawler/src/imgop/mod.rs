@@ -2,6 +2,7 @@
 // Copyright 2021 Daniel Vogelbacher <daniel@chaospixel.com>
 
 pub mod develop;
+pub mod dngopcode;
 pub mod gamma;
 pub mod matrix;
 pub mod raw;

@@ -238,6 +238,8 @@ pub struct RawImage {
   pub color_matrix: HashMap<Illuminant, FlatColorMatrix>,
 
   pub dng_tags: HashMap<u16, Value>,
+
+  pub dng_opcode_lists: DngOpcodeLists,
 }
 
 /// The actual image data, after decoding
@@ -385,6 +387,7 @@ impl RawImage {
       orientation: Orientation::Normal, //cam.orientation, // TODO fixme
       color_matrix: cam.color_matrix,
       dng_tags: HashMap::new(),
+      dng_opcode_lists: DngOpcodeLists::default()
     }
   }
 

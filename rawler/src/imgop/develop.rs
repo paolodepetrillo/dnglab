@@ -17,12 +17,16 @@ use super::{
   sensor::bayer::{bilinear::Bilinear4Channel, ppg::PPGDemosaic, Demosaic},
   xyz::Illuminant,
   Dim2, Rect,
+  dngopcode::decode_opcode_list,
 };
 
 #[derive(PartialEq, Eq, Debug, Clone, Copy)]
 pub enum ProcessingStep {
+  DngOpcodeList1,
   Rescale,
+  DngOpcodeList2,
   Demosaic,
+  DngOpcodeList3,
   CropActiveArea,
   WhiteBalance,
   Calibrate,
@@ -83,8 +87,11 @@ impl Default for RawDevelop {
   fn default() -> Self {
     Self {
       steps: vec![
+        ProcessingStep::DngOpcodeList1,
         ProcessingStep::Rescale,
+        ProcessingStep::DngOpcodeList2,
         ProcessingStep::Demosaic,
+        ProcessingStep::DngOpcodeList3,
         ProcessingStep::CropActiveArea,
         ProcessingStep::WhiteBalance,
         ProcessingStep::Calibrate,
@@ -115,8 +122,23 @@ impl RawDevelop {
   /// has only one color channel.
   pub fn develop_intermediate(&self, rawimage: &RawImage) -> crate::Result<Intermediate> {
     let mut rawimage = rawimage.clone();
+
+    if self.steps.contains(&ProcessingStep::DngOpcodeList1) {
+      if let Some(opcode_list_1) = &rawimage.dng_opcode_lists.list_1 {
+        let ops = decode_opcode_list(&opcode_list_1)?;
+        println!("{:?}", ops);
+      }
+    }
+
     if self.steps.contains(&ProcessingStep::Rescale) {
       rawimage.apply_scaling()?;
+    }
+
+    if self.steps.contains(&ProcessingStep::DngOpcodeList2) {
+      if let Some(opcode_list_2) = &rawimage.dng_opcode_lists.list_2 {
+        let ops = decode_opcode_list(&opcode_list_2)?;
+        println!("{:?}", ops);
+      }
     }
 
     let mut intermediate = match rawimage.cpp {
@@ -158,6 +180,13 @@ impl RawDevelop {
         }
         _ => intermediate,
       };
+    }
+
+    if self.steps.contains(&ProcessingStep::DngOpcodeList3) {
+      if let Some(opcode_list_3) = &rawimage.dng_opcode_lists.list_3 {
+        let ops = decode_opcode_list(&opcode_list_3)?;
+        println!("{:?}", ops);
+      }
     }
 
     if self.steps.contains(&ProcessingStep::Calibrate) {
